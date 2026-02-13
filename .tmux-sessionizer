@@ -1,0 +1,32 @@
+# This will run for all sessions unless overridden by a local .tmux-sessionizer
+
+# Reusable venv activation command
+VENV_ACTIVATE='
+if [ -f "venv/bin/activate" ]; then
+    source venv/bin/activate
+elif [ -f ".venv/bin/activate" ]; then
+    source .venv/bin/activate
+elif [ -f "env/bin/activate" ]; then
+    source env/bin/activate
+fi
+'
+
+# Create window for nvim (rename current window)
+tmux rename-window -t 1 'nvim'
+
+# Create window for shell with venv activation
+tmux new-window -t 2 -n 'shell' "$VENV_ACTIVATE; exec \$SHELL"
+
+# Create window for lazygit (and open shell when lazygit is closed)
+tmux new-window -t 3 -n 'lazygit' 'lazygit; exec $SHELL'
+
+# Create window for Claude code
+tmux new-window -t 4 -n 'claude'
+
+# Select the first window (nvim)
+tmux select-window -t 1
+
+# Activate venv if it exists, then start nvim
+eval "$VENV_ACTIVATE"
+
+nvim
